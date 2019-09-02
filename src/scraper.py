@@ -1,5 +1,4 @@
 import requests
-import urllib.request
 import time
 from bs4 import BeautifulSoup
 import re
@@ -10,7 +9,7 @@ def get_lyrics(link):
     soup = BeautifulSoup(response.text, "html.parser")
     raw = soup.find("div", class_="lyrictxt").get_text()
     clean = re.sub(".*\\[.*\n?", "", raw)
-    return clean.strip()
+    return clean.strip() + "\n\n"
 
 
 def get_links(site, artist):
@@ -25,23 +24,27 @@ def get_links(site, artist):
 
 
 if __name__=="__main__":
-    site = "https://www.lyricsfreak.com"
-    artist = "/l/lana+del+rey/"
-    links = get_links(site, artist)
+    try:
+        site = "https://www.lyricsfreak.com"
+        artist = "/l/lana+del+rey/"
+        links = get_links(site, artist)
 
-    N = len(links)
-    n = 1
+        N = len(links)
+        n = 1
 
-    # write to file
-    with open("../out/lana_lyrics.txt", "w+") as f:
-        for link in links:
-            song_lyrics = get_lyrics(link)
-            print("Writing song %d/%d" % (n, N))
-            f.write(song_lyrics)
-            n += 1
+        # write to file
+        with open("../out/lana_lyrics.txt", "w+") as f:
+            for link in links:
+                song_lyrics = get_lyrics(link)
+                print("Writing song %d/%d" % (n, N))
+                f.write(song_lyrics)
+                n += 1
 
-            if n % 20 == 0:
-                time.sleep(60)
+                if n % 20 == 0:
+                    time.sleep(20)
 
-        f.close()
+            f.close()
+    except Exception as e:
+        print("Connection refused")
+
 
